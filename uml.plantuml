@@ -1,0 +1,78 @@
+@startuml uml
+
+class QuizWord {
+  - int len;
+  - wstring lat_word;
+  - wstring cyl_word;
+  + QuizWord(int len);
+  + const wstring& get_lat_word() {
+  + const wstring& get_cyl_word() {
+}
+
+class Board {
+  - wchar_t board[MAX_X][MAX_Y];
+  + Board();
+  + wchar_t get(int x, int y);
+  + void set(int x, int y, wchar_t ch);
+  + void draw(int x, int y, int width, int height, const wchar_t* str);
+  + void empty_board();
+}
+
+abstract class GameObj {
+  # QuizWord quiz;
+  # int cord_x;
+  # int cord_y;
+  # double accurate_y;
+  # int width;
+  # int height;
+  + GameObj(int width, int height, int wordlen);
+  + virtual double speed();
+  + virtual void draw_obj(Board& board);
+  + void move_step();
+  + bool match_with(const wstring& word);
+  + bool out_of_board();
+}
+QuizWord *-- GameObj
+Board <-- GameObj
+
+class HashTag {
+  + HashTag();
+  + double speed();
+  + void draw_obj(Board& board);
+}
+GameObj <|- HashTag
+Board <-- HashTag
+
+class AtMark {
+  + AtMark();
+  + double speed();
+  + void draw_obj(Board& board);
+}
+GameObj <|- AtMark
+Board <-- AtMark
+
+class Dollar {
+  + Dollar();
+  + double speed();
+  + void draw_obj(Board& board);
+}
+GameObj <|- Dollar
+Board <-- Dollar
+
+class Game {
+  - int level;
+  - int heart;
+  - Board board;
+  - vector<GameObj*> objects;
+  - void word_hit();
+  - bool over_check();
+  - void generate();
+  - void refresh();
+  - void display();
+  + Game();
+  + void run_game();
+}
+Board *-- Game
+GameObj o-- Game
+
+@enduml

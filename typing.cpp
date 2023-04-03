@@ -3,7 +3,6 @@
 #include <vector>
 #include <chrono>
 #include <random>
-#include <thread>
 
 using namespace std;
 using namespace std::chrono;
@@ -167,14 +166,15 @@ public:
 };
 
 class GameObj {
-public:
+protected:
+    QuizWord quiz;
     int cord_x;
     int cord_y;
     double accurate_y;
     int width;
     int height;
-    QuizWord quiz;
-    GameObj(int width, int height, int wordlen) : 
+public:
+    GameObj(int width, int height, int wordlen) :
         quiz(QuizWord(wordlen)),
         width(width),
         height(height)
@@ -184,6 +184,12 @@ public:
         accurate_y = 0;
     }
     virtual ~GameObj() {};
+    int get_x() {
+        return cord_x;
+    }
+    int get_y() {
+        return cord_y;
+    }
     virtual double speed() = 0;
     virtual void draw_obj(Board& board) = 0;
     void move_step() {
@@ -193,12 +199,14 @@ public:
     bool match_with(const wstring& word) {
         return quiz.get_lat_word() == word;
     }
+    bool out_of_board() {
+        return cord_y >= MAX_Y;
+    }
 };
 
 class HashTag : public GameObj {
 public:
     HashTag() : GameObj(3,3,1) {}
-    ~HashTag() {}
     double speed() {
         return 0.5;
     }
@@ -217,7 +225,6 @@ L"\
 class AtMark : public GameObj {
 public:
     AtMark() : GameObj(4,3,2) {}
-    ~AtMark() {}
     double speed() {
         return 0.4;
     }
@@ -236,7 +243,6 @@ L"\
 class Dollar : public GameObj {
 public:
     Dollar() : GameObj(5,3,3) {}
-    ~Dollar() {}
     double speed() {
         return 0.3;
     }
@@ -253,15 +259,10 @@ $$$$$\
 };
 
 class Game {
-public:
     int level;
     int heart;
     Board board;
     vector<GameObj*> objects;
-    Game() {
-        level = 0;
-        heart = 5;
-    }
     void word_hit() {
         wstring word;
         wcin >> word;
@@ -278,7 +279,7 @@ public:
     bool over_check() {
         vector<GameObj*> vec;
         for(auto iter=objects.begin(); iter!=objects.end(); iter++) {
-            if((*iter)->cord_y >= MAX_Y) {
+            if((*iter)->out_of_board()) {
                 heart -= 1;
                 delete (GameObj*)*iter;
             } else {
@@ -331,6 +332,11 @@ public:
         }
         wcout << L'\n';
         wcout.flush();
+    }
+public:
+    Game() {
+        level = 0;
+        heart = 5;
     }
     void run_game() {
         int timer = 0;
