@@ -184,12 +184,6 @@ public:
         accurate_y = 0;
     }
     virtual ~GameObj() {};
-    int get_x() {
-        return cord_x;
-    }
-    int get_y() {
-        return cord_y;
-    }
     virtual double speed() = 0;
     virtual void draw_obj(Board& board) = 0;
     void move_step() {
